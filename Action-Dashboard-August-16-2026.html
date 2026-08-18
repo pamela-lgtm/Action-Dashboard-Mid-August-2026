@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verandah Action Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F4EC;
+  --card:#FFFDF8;
+  --ink:#1A1A1A;
+  --deep:#0F5045;
+  --teal:#008C82;
+  --gold:#C9A227;
+  --rule:#E6DFCE;
+  --muted:#9A9282;
+  --done:#B3AC9C;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Jost',system-ui,sans-serif;font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1240px;margin:0 auto;padding:48px 28px 90px;}
+
+/* masthead */
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+h1{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;font-size:clamp(42px,7vw,72px);
+   color:var(--deep);margin:6px 0 4px;line-height:1;}
+.tag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--teal);}
+.adjectives{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+.stamp{font-size:12px;color:var(--muted);margin-top:14px;letter-spacing:.04em;}
+
+/* progress */
+.progress{margin:30px 0 10px;padding:18px 22px;background:var(--card);
+  border:1px solid var(--rule);border-radius:14px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.progress .label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);}
+.progress .count{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--deep);}
+.bar{flex:1;min-width:160px;height:5px;background:var(--rule);border-radius:99px;overflow:hidden;}
+.bar span{display:block;height:100%;width:0;background:var(--teal);transition:width .4s ease;}
+
+/* focus panel */
+.focus{margin:26px 0 44px;padding:26px 28px;background:var(--card);
+  border:1px solid var(--gold);border-radius:14px;}
+.focus h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:30px;color:var(--deep);margin:0 0 2px;}
+.focus .sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+
+/* sections */
+section{margin:56px 0 0;}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  border-bottom:1px solid var(--deep);padding-bottom:10px;margin-bottom:26px;}
+.sechead h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(28px,4vw,42px);
+  color:var(--deep);margin:0;line-height:1.1;}
+.sechead .flag{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;color:var(--gold);white-space:nowrap;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;align-items:start;}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:24px 24px 8px;position:relative;}
+.card.flagged{border-color:var(--gold);}
+.pill{position:absolute;top:-11px;right:20px;background:var(--gold);color:#fff;
+  font-size:9px;letter-spacing:.18em;text-transform:uppercase;padding:4px 12px;border-radius:99px;}
+.card h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;color:var(--ink);margin:0 0 3px;}
+.card .kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+
+ul{list-style:none;margin:0;padding:0;}
+li{display:flex;gap:13px;padding:13px 0;border-bottom:1px dashed var(--rule);align-items:flex-start;}
+li:last-child{border-bottom:none;}
+input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;flex:0 0 auto;
+  width:19px;height:19px;margin:2px 0 0;border:2px solid var(--teal);border-radius:5px;
+  background:transparent;cursor:pointer;position:relative;transition:background .15s;
+}
+input[type=checkbox]:checked{background:var(--teal);}
+input[type=checkbox]:checked::after{
+  content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+input[type=checkbox]:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+.txt{font-size:15px;line-height:1.45;}
+li.done .txt{text-decoration:line-through;color:var(--done);}
+li.done .note{color:var(--done);}
+.note{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:14px;color:var(--muted);margin-top:5px;line-height:1.4;}
+
+/* archive */
+.archive{background:#F1EDE1;border:1px solid var(--rule);border-radius:14px;padding:26px 28px;}
+.archive h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;color:var(--deep);margin:0 0 3px;}
+.archive .kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.archive ol{margin:0;padding-left:20px;}
+.archive li{display:list-item;border:none;padding:7px 0;font-size:14px;color:#5F5A4E;}
+
+/* asks */
+.asks{background:var(--card);border-left:3px solid var(--gold);border-radius:0 14px 14px 0;padding:24px 28px;}
+.asks h3{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:24px;color:var(--deep);margin:0 0 12px;}
+.asks li{border-bottom:1px dashed var(--rule);display:list-item;padding:11px 0;font-size:15px;}
+.asks ul{padding-left:0;}
+
+footer{margin-top:80px;padding-top:34px;border-top:1px solid var(--rule);text-align:center;}
+footer .sig{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--teal);}
+footer .est{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:8px;}
+.reset{margin-top:24px;background:transparent;border:1px solid var(--rule);color:var(--muted);
+  font-family:'Jost',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  padding:12px 26px;border-radius:99px;cursor:pointer;}
+.reset:hover{border-color:var(--gold);color:var(--gold);}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+@media (max-width:640px){.wrap{padding:32px 18px 70px;}.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Verandah Properties</div>
+  <h1>Action Dashboard</h1>
+  <div class="tag">Lake Nona's Property Management Standard</div>
+  <div class="adjectives">Bespoke &middot; Curated &middot; Boutique &middot; Niche</div>
+  <div class="stamp">Rebuilt 16 August 2026 &nbsp;·&nbsp; carries forward the open items from 17 June, plus this week's intake</div>
+
+  <div class="progress">
+    <span class="label">Overall Progress</span>
+    <span class="count"><b id="ct">0</b> of <b id="tot">0</b></span>
+    <span class="bar"><span id="fill"></span></span>
+  </div>
+
+  <div class="focus">
+    <h2>Monday's Focus</h2>
+    <div class="sub">Five things &middot; when these are done, the day is a win</div>
+    <ul>
+      <li><input type="checkbox"><span class="txt">Walk Nitin's property — Silver Buttonwood<span class="note">Review entry notes first. Photograph and video the sample door.</span></span></li>
+      <li><input type="checkbox"><span class="txt">Office visit — decide what stays and what goes before going virtual</span></li>
+      <li><input type="checkbox"><span class="txt">Send Becky the Fair Housing refresher<span class="note">Highest-exposure item on this board. Don't let it slide past Monday.</span></span></li>
+      <li><input type="checkbox"><span class="txt">Get the Laverne maintenance status — you committed to following through</span></li>
+      <li><input type="checkbox"><span class="txt">Coastal Breeze — find out why it isn't drawing interest</span></li>
+    </ul>
+  </div>
+
+  <!-- ============ TIER 1 ============ -->
+  <section>
+    <div class="sechead"><h2>This Week — Time-Bound</h2><span class="flag">Clock Running</span></div>
+    <div class="grid">
+
+      <div class="card flagged"><span class="pill">Tomorrow</span>
+        <h3>Monday, 17 August</h3><div class="kicker">On the calendar</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Review Nitin's property notes, including how to enter</span></li>
+          <li><input type="checkbox"><span class="txt">Photograph and video the sample door</span></li>
+          <li><input type="checkbox"><span class="txt">Note anything else needing attention pre-listing</span></li>
+          <li><input type="checkbox"><span class="txt">Inventory the office — what we keep, what we leave</span></li>
+        </ul>
+      </div>
+
+      <div class="card flagged"><span class="pill">Compliance</span>
+        <h3>Fair Housing &amp; Disclosure</h3><div class="kicker">Do not defer</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Bullet-point federal Fair Housing refresher for Becky — what can and cannot be discussed about an applicant<span class="note">Triggered by protected-class detail volunteered about a Belfry applicant on an owner call.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Confirm Becky discloses she is assisting only, with no sway over the application process</span></li>
+          <li><input type="checkbox"><span class="txt">Rently training for Becky — what an applicant actually experiences trying to view a property</span></li>
+          <li><input type="checkbox"><span class="txt">Research and write the Rently disclosure<span class="note">Third-party vendor, not us. Viewers will be charged. Why they charge — convenience, security. Package choice is theirs, not ours.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Add the Rently disclosure to the canned showing-request response</span></li>
+        </ul>
+      </div>
+
+      <div class="card flagged"><span class="pill">Revenue</span>
+        <h3>Vacancy at Risk</h3><div class="kicker">Every day costs</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Coastal Breeze — diagnose the lack of attention; check Zillow interest across all listings</span></li>
+          <li><input type="checkbox"><span class="txt">Mobberly — rewrite the title and description</span></li>
+          <li><input type="checkbox"><span class="txt">Mobberly — confirm pool and landscaping are being handled (check the work orders)</span></li>
+          <li><input type="checkbox"><span class="txt">Mobberly — add Lake Nona exterior photos and refresh the marketing</span></li>
+          <li><input type="checkbox"><span class="txt">Lake District — what's the update on the tenant?</span></li>
+        </ul>
+      </div>
+
+      <div class="card flagged"><span class="pill">Clients</span>
+        <h3>Follow-Through Owed</h3><div class="kicker">Promises made</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Laverne — get the maintenance status<span class="note">You said you'd follow through.</span></span></li>
+          <li><input type="checkbox"><span class="txt">6665 Bridgman — did the vendors we referred get back to the owner?</span></li>
+          <li><input type="checkbox"><span class="txt">If Bridgman signs: full Lake Nona and Laureate Park push — video, Instagram, Facebook<span class="note">Owner told: basic lawn care not required, but weed, pest and fertilizer are — with the reasoning.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Audit every property closed this year — where are we short of A+ communication and service?</span></li>
+          <li><input type="checkbox"><span class="txt">Navin — credit a full month's management fee when Alora on Luminary rents<span class="note">Your promise. Track it so it can't be missed at lease-up.</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card flagged"><span class="pill">Financial</span>
+        <h3>Tax &amp; Accounting</h3><div class="kicker">Deadline-driven</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Download all accounting documents from Onvio — find the fastest export method</span></li>
+          <li><input type="checkbox"><span class="txt">Confirm you hold every completed tax filing, for future accountants</span></li>
+          <li><input type="checkbox"><span class="txt">Find Rebeca's last email about doing the W-2 and request it</span></li>
+          <li><input type="checkbox"><span class="txt">Marco — where is he on your taxes? He asked for 2024, which you provided</span></li>
+          <li><input type="checkbox"><span class="txt">Determine what ADP must carry vs. not, including W-2 treatment<span class="note">Reference: 401(k) $31,000 contributed Dec 2025, plus $15,000 in 2026 before 3/15 for tax year 2025. HSA $9,550 same tax year.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Tax &amp; ADP carried from June: open Rebecca's email on 2025 steps; confirm Reconcile Daily is done<span class="note">Steps 5–7 are gated on Camilla replying. She was emailed in June. That chain is stalled on a follow-up, not on you.</span></span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 2 ============ -->
+  <section>
+    <div class="sechead"><h2>Communication &amp; Accountability</h2><span class="flag">The Bulletproofing</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>One Person, One Address</h3><div class="kicker">Named ownership</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Retire the shared inbox model for client communication<span class="note">A common box managed in LeadSimple means no one owns anything.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Assign every client-facing function a named person and a dedicated email address</span></li>
+          <li><input type="checkbox"><span class="txt">Write the standard down: no client should ever wonder how to reach us</span></li>
+          <li><input type="checkbox"><span class="txt">Simplify inbound and outbound email templates — cut length, cut duplication</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Phone to ClickUp Chain</h3><div class="kicker">Close the gap</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Confirm John's flow: main number during business hours, transfer to Luz or Megan when available</span></li>
+          <li><input type="checkbox"><span class="txt">Confirm John logs the call in ClickUp and assigns it when no transfer is possible</span></li>
+          <li><input type="checkbox"><span class="txt">Name the person who monitors the ClickUp Request Log</span></li>
+          <li><input type="checkbox"><span class="txt">Require visible steps and actions on every Request Log item<span class="note">Nothing sits in pending mode with no evidence of movement.</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card flagged"><span class="pill">Urgent</span>
+        <h3>Franchise-Style Processes</h3><div class="kicker">Steps · philosophy · why · resources</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Build the ClickUp onboarding processes</span></li>
+          <li><input type="checkbox"><span class="txt">Every process carries: the steps, the philosophy, the why, and the linked resources</span></li>
+          <li><input type="checkbox"><span class="txt">Expandable tabs on each step explaining why it exists, so anyone can run it</span></li>
+          <li><input type="checkbox"><span class="txt">Define KPIs per process and surface them on a dashboard</span></li>
+          <li><input type="checkbox"><span class="txt">Tie team bonuses to KPI adherence</span></li>
+          <li><input type="checkbox"><span class="txt">Build the mechanism that catches every missed step</span></li>
+          <li><input type="checkbox"><span class="txt">Decide which processes trigger a Review Link send</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Team Time &amp; Presence</h3><div class="kicker">Accountability</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Assign Abril: time off, sick days, allotment overages — notify you and the team member<span class="note">Monthly report. This becomes one of her KPIs.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Abril's second KPI: flag when to charge a tenant for a late renewal signature</span></li>
+          <li><input type="checkbox"><span class="txt">Decide the remote-worker presence standard — logged into ClickUp?</span></li>
+          <li><input type="checkbox"><span class="txt">Get Harvey's exact hours; same for Rain</span></li>
+          <li><input type="checkbox"><span class="txt">Staff immediate business-hours coverage for showings and Rently help</span></li>
+          <li><input type="checkbox"><span class="txt">Design the audit for whether Luz is answering the phone</span></li>
+          <li><input type="checkbox"><span class="txt">Build proactive, strategic audits as standing practice<span class="note">This is the mechanism that stops problems instead of discovering them.</span></span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 3 ============ -->
+  <section>
+    <div class="sechead"><h2>Owner Education Engine</h2><span class="flag">Monthly Cadence</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>The Monthly Piece</h3><div class="kicker">Format &amp; delivery</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Lock the DISC format: open in D voice, then headings that speak to I, S and C<span class="note">Reads as one cohesive piece; each owner finds their own section.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Build the standard Verandah communication style guide for each DISC type</span></li>
+          <li><input type="checkbox"><span class="txt">Assign every owner a DISC profile in AppFolio and/or ClickUp</span></li>
+          <li><input type="checkbox"><span class="txt">Set the monthly send date and name who owns the send</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Topic Backlog</h3><div class="kicker">One per month</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">We're not onsite managers — scope, and irrigation as a tenant responsibility</span></li>
+          <li><input type="checkbox"><span class="txt">Deferred maintenance: declining the advice, then owning the outcome</span></li>
+          <li><input type="checkbox"><span class="txt">A/C repair vs. replace — the judgment call when a tenant is in 98-degree heat</span></li>
+          <li><input type="checkbox"><span class="txt">We're not magicians — what we can control and what we can't</span></li>
+          <li><input type="checkbox"><span class="txt">You are a business owner, not a homeowner</span></li>
+          <li><input type="checkbox"><span class="txt">Your property is your product; your tenant is your customer</span></li>
+          <li><input type="checkbox"><span class="txt">Selling a former rental: capital gains and depreciation recapture, not just commission</span></li>
+          <li><input type="checkbox"><span class="txt">The 1031 exchange as an alternative to selling</span></li>
+          <li><input type="checkbox"><span class="txt">Why labor and parts cost more, and why to reserve for what's coming</span></li>
+          <li><input type="checkbox"><span class="txt">Not passive, not illiquid</span></li>
+          <li><input type="checkbox"><span class="txt">Turn costs: owner-performed repairs and what the added vacancy really costs</span></li>
+          <li><input type="checkbox"><span class="txt">The lowest bid is not the best bid — and the leverage recurring work buys</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Research Required</h3><div class="kicker">Before the writing</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Deep research: appliance and component durability vs. 10–25 years ago<span class="note">The point being: a two-year-old unit is not comparable to one built in 2001.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Research: vendors charging for estimates, credited when the work is awarded — how common, what's standard</span></li>
+          <li><input type="checkbox"><span class="txt">Research: the skilled-trade shortage — tradespeople aging out, a generation steered to college, supply and demand</span></li>
+          <li><input type="checkbox"><span class="txt">Boil down the old Constant Contact newsletters as source material</span></li>
+          <li><input type="checkbox"><span class="txt">Work the numbers: owner-performed turn vs. the vacancy loss it creates</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 4 ============ -->
+  <section>
+    <div class="sechead"><h2>Client Experience &amp; Retention</h2><span class="flag">Listening System</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Quarterly Survey</h3><div class="kicker">Short · quarterly · all clients</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Finalize the service categories to rate</span></li>
+          <li><input type="checkbox"><span class="txt">Set the scale: 1 poor, 2 average, 3 exceptional</span></li>
+          <li><input type="checkbox"><span class="txt">Add the conditional follow-up that opens on any 1 or 2</span></li>
+          <li><input type="checkbox"><span class="txt">Split the follow-up options into what we control and what we don't<span class="note">Invisible to them, decisive for us: "communication about maintenance" is ours to fix; "pricing" is education.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Build reporting that separates the two so fix vs. educate is obvious</span></li>
+          <li><input type="checkbox"><span class="txt">Roll out to owners, then tenants, then vendors</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Exit &amp; Loss Learning</h3><div class="kicker">Why they left</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Build the exit survey</span></li>
+          <li><input type="checkbox"><span class="txt">Add a required loss brain dump to the offboarding process</span></li>
+          <li><input type="checkbox"><span class="txt">Tag every loss by service — maintenance, communication, accounting — to find the pattern</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Face-to-Face Program</h3><div class="kicker">We value you, in person</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Offer rotating in-person client meetings through Calendly</span></li>
+          <li><input type="checkbox"><span class="txt">At each meeting: review the property and build a deferred-maintenance plan</span></li>
+          <li><input type="checkbox"><span class="txt">Pull spend-to-date against property age, appliance age and component life</span></li>
+          <li><input type="checkbox"><span class="txt">Monthly blocks of owner communication — at-risk clients first</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 5 ============ -->
+  <section>
+    <div class="sechead"><h2>Maintenance &amp; Vendor Value</h2><span class="flag">Where We Earn It</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Vendor Bench</h3><div class="kicker">Depth in the corridor</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Check in with Megan — more vendors, and Lake Nona vendors for Lake Nona properties</span></li>
+          <li><input type="checkbox"><span class="txt">Add Third Coat Cabinets to the vendor list</span></li>
+          <li><input type="checkbox"><span class="txt">Megan to vet vendors capable of a branded partner-vendor presentation<span class="note">Carried from June. They must hold client trust and act the part.</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Verandah Warranty Program</h3><div class="kicker">Built on our own bench</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Design an in-house warranty program with our vendors, by area of expertise</span></li>
+          <li><input type="checkbox"><span class="txt">Strada model: A/C preventative visits, discounted coil pull and clean, drain line blowout, credit toward a new unit</span></li>
+          <li><input type="checkbox"><span class="txt">Position against the national warranty companies — ours is people we actually vet</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Turn Cost Education</h3><div class="kicker">Support Luz &amp; Megan</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Build the response for owners who reject turn quotes and want to do the work themselves</span></li>
+          <li><input type="checkbox"><span class="txt">Show where the maintenance department adds value — vetting, coordination, speed</span></li>
+          <li><input type="checkbox"><span class="txt">Address Megan's report that newer clients dislike the turn expense</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 6 ============ -->
+  <section>
+    <div class="sechead"><h2>Marketing, Sales Division &amp; Growth</h2><span class="flag">Visibility</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Lake Nona Realty</h3><div class="kicker">Referral channel</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Design a professional brochure the agents can hand to potential investors</span></li>
+          <li><input type="checkbox"><span class="txt">Positioning: how we help, and that we are Lake Nona's property management company</span></li>
+          <li><input type="checkbox"><span class="txt">Update the marketing materials; create the info pamphlets</span></li>
+          <li><input type="checkbox"><span class="txt">Schedule the drop-off for a Tuesday or Wednesday; bring a local treat</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Sales Division</h3><div class="kicker">Two vocations</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Stand up marketing for the Sales Division, separate from property management</span></li>
+          <li><input type="checkbox"><span class="txt">Sequence: current clients first, then renters</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Content &amp; Video</h3><div class="kicker">Social + web</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Choose the photo package from Becky's photographer</span></li>
+          <li><input type="checkbox"><span class="txt">Work out how to get strong social video out of that same shoot</span></li>
+          <li><input type="checkbox"><span class="txt">Revisit the video company Marc Cunningham referred</span></li>
+          <li><input type="checkbox"><span class="txt">Study Marc Cunningham's website for operational takeaways</span></li>
+          <li><input type="checkbox"><span class="txt">Organize photos and videos for social; source Lake Nona drone footage</span></li>
+          <li><input type="checkbox"><span class="txt">Follow up with Clockwork Media Group</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>New Channels</h3><div class="kicker">Where else we can win</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Should Landlord Rescue be marketed to FRBOs?</span></li>
+          <li><input type="checkbox"><span class="txt">How do we appeal to Canadian owners?</span></li>
+          <li><input type="checkbox"><span class="txt">Prepare every question for the Casa.io interview on private services</span></li>
+          <li><input type="checkbox"><span class="txt">Research AI phone answering cost<span class="note">Damian wants to work with us — may fit here.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Research advertising options on Lake Nona HOA sites</span></li>
+          <li><input type="checkbox"><span class="txt">Research whether Facebook can merge two Instagram and two Facebook profiles<span class="note">Keep the one with the most followers.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Postcard zip expansion: 32824, 32827, 32832, 34771, 34772, 32829</span></li>
+          <li><input type="checkbox"><span class="txt">Follow up on the Nona Adventure Park fence ad</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 7 ============ -->
+  <section>
+    <div class="sechead"><h2>Team &amp; Development</h2><span class="flag">Leadership Drumbeat</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Weekly Highlights</h3><div class="kicker">One theme a week</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Queue the themes after Integrity: High Standards, Trust, Honesty, Proactivity, Consistency</span></li>
+          <li><input type="checkbox"><span class="txt">Set up Bitly tracking to confirm the team is actually reading them</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Development &amp; Reward</h3><div class="kicker">Investment in the team</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Look into NARPM education for the team; check what's coming up</span></li>
+          <li><input type="checkbox"><span class="txt">Fly the women in for the NARPM conference</span></li>
+          <li><input type="checkbox"><span class="txt">Work with Megan on leadership and consistency</span></li>
+          <li><input type="checkbox"><span class="txt">Megan and Luz to finish the video intro — review the HTML</span></li>
+          <li><input type="checkbox"><span class="txt">Celebrate in Orlando when the processes are done; the guys cover, then take theirs</span></li>
+          <li><input type="checkbox"><span class="txt">Megan: lead-based paint addendum for properties built 1978 or earlier</span></li>
+          <li><input type="checkbox"><span class="txt">Megan: cover sales leads when you're out of office</span></li>
+          <li><input type="checkbox"><span class="txt">Megan: bi-monthly maintenance education emails through AppFolio</span></li>
+          <li><input type="checkbox"><span class="txt">John: confirm direction for owner client calls; verify he's using the script</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ TIER 8 ============ -->
+  <section>
+    <div class="sechead"><h2>Carried Forward from June</h2><span class="flag">Still Open</span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Quick Hits &amp; Handoffs</h3><div class="kicker">Small, overdue</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">ClickUp settings: get an email when John tags you in the Request Log<span class="note">You've already missed a potential client over this.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Turn over the SureVestor project to Megan</span></li>
+          <li><input type="checkbox"><span class="txt">PMWebsites: route new leads to your Hot Pipeline, not the RentScale Sales Pipeline</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Virtual Accompanied Showings</h3><div class="kicker">Brand differentiator</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Build the process: don't unlock Rently until you're on the video call</span></li>
+          <li><input type="checkbox"><span class="txt">Verify lockup on camera before ending the call</span></li>
+          <li><input type="checkbox"><span class="txt">Market it as a Verandah-only feature</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Office &amp; Vendor Audit</h3><div class="kicker">Operational cleanup</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Audit the Baldwin Park office invoices — confirm chargebacks for mail and admin</span></li>
+          <li><input type="checkbox"><span class="txt">Analyze what we ask of Baldwin Park vs. what we can process ourselves<span class="note">They've gone sideways since the buyout. Every expense has to earn its place.</span></span></li>
+          <li><input type="checkbox"><span class="txt">Analyze and bill back excessive postage per the agreement</span></li>
+          <li><input type="checkbox"><span class="txt">Set up monthly Lake Nona owner update emails — growth, dominance, area knowledge</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Pipeline Standards</h3><div class="kicker">Documented gates</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Build the 75% sales / 25% operations split into the weekly schedule</span></li>
+          <li><input type="checkbox"><span class="txt">Connect with Lake Nona physicians directly</span></li>
+          <li><input type="checkbox"><span class="txt">Partner with CPAs, financial reps and attorneys</span></li>
+          <li><input type="checkbox"><span class="txt">Create builder handouts for investors</span></li>
+          <li><input type="checkbox"><span class="txt">Create builder outreach: how Verandah manages their inventory</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>The Umbrella</h3><div class="kicker">Lead through exit</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Map every client touchpoint from lead stage through exit</span></li>
+          <li><input type="checkbox"><span class="txt">Identify referral categories: vendors, movers, clean-out, insurance, entity setup, 1031</span></li>
+          <li><input type="checkbox"><span class="txt">Build the partner path: referral structure plus value-add</span></li>
+          <li><input type="checkbox"><span class="txt">Define the positioning — Verandah as the umbrella over the owner's whole journey</span></li>
+          <li><input type="checkbox"><span class="txt">Local vendor coupon page: build it, decide monetization, tie it to the Vendor Initiative Program</span></li>
+          <li><input type="checkbox"><span class="txt">Which parallel businesses could serve our captive Lake Nona audience?</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Website &amp; Story</h3><div class="kicker">Voice and structure</div>
+        <ul>
+          <li><input type="checkbox"><span class="txt">Website review — it feels redundant, too much of the same information</span></li>
+          <li><input type="checkbox"><span class="txt">Tone the language down; consolidate the duplication</span></li>
+          <li><input type="checkbox"><span class="txt">Map the DISC-based pathways, S and C focus, and build the site to support them</span></li>
+          <li><input type="checkbox"><span class="txt">Design the circular visual — the entire scope of work for potential owners</span></li>
+          <li><input type="checkbox"><span class="txt">Write the origin story: started as an investor, made the rentals better than your own home</span></li>
+          <li><input type="checkbox"><span class="txt">Lock the brand adjectives: bespoke, curated, boutique, niche</span></li>
+          <li><input type="checkbox"><span class="txt">Build out the 12–16 week schedule</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ ASKS ============ -->
+  <section>
+    <div class="sechead"><h2>Needs Your Input</h2><span class="flag">Before I Can Write It</span></div>
+    <div class="asks">
+      <h3>Five things I won't guess at</h3>
+      <ul>
+        <li>The $250 late-renewal charge — is that in the management agreement today, a policy you're instituting, or still under consideration?</li>
+        <li>Postage billback — what exactly does the agreement entitle us to recover?</li>
+        <li>Rently — which packages do we present now, and what does the current canned response say?</li>
+        <li>The warranty program — what can we actually commit to contractually, and who bears the cost?</li>
+        <li>Dedicated email structure — which functions get split out, and who owns each one?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ ARCHIVE ============ -->
+  <section>
+    <div class="sechead"><h2>Completed</h2><span class="flag">Running Tally · 12</span></div>
+    <div class="archive">
+      <h3>Closed out as of 16 August 2026</h3>
+      <div class="kicker">Carried forward from the June board</div>
+      <ol>
+        <li>Found Camilla's contact information at ADP</li>
+        <li>Sent Camilla the W-2 recalculation status email</li>
+        <li>Built the vendor-first inspection cost math</li>
+        <li>Built the monthly team inspiration message</li>
+        <li>Defined what "another level of greatness" looks like in practice</li>
+        <li>Told Megan she needs to join MLS</li>
+        <li>Updated the personal cell voicemail</li>
+        <li>Sent the inspector to the MMA owner's property</li>
+        <li>Sent the handwritten card to Mario at Dennis Realty</li>
+        <li>Followed up with Coralie at Laureate Park Elementary on the car line banner</li>
+        <li>Added "rentals curated from the finest clients" to the marketing</li>
+        <li>Captured the "psycho perfect tenant" story and landed the lesson</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>
+    <div class="sig">Curating Lake Nona's Finest Rental Portfolio</div>
+    <div class="est">Verandah Properties &middot; Est. 20+ Years</div>
+    <button class="reset" id="reset">Reset Checkboxes</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[type=checkbox]'));
+  var ct = document.getElementById('ct'), tot = document.getElementById('tot'), fill = document.getElementById('fill');
+  var KEY = 'verandah-dashboard-2026-08-16';
+
+  function load(){
+    try{
+      var raw = window.localStorage.getItem(KEY);
+      if(!raw) return;
+      var saved = JSON.parse(raw);
+      boxes.forEach(function(b,i){ if(saved[i]) b.checked = true; });
+    }catch(e){ /* storage unavailable — dashboard still works, just won't persist */ }
+  }
+  function save(){
+    try{ window.localStorage.setItem(KEY, JSON.stringify(boxes.map(function(b){return b.checked?1:0;}))); }
+    catch(e){}
+  }
+  function paint(){
+    var done = 0;
+    boxes.forEach(function(b){
+      var li = b.closest('li');
+      if(b.checked){ done++; if(li) li.classList.add('done'); }
+      else if(li){ li.classList.remove('done'); }
+    });
+    ct.textContent = done;
+    tot.textContent = boxes.length;
+    fill.style.width = boxes.length ? (done/boxes.length*100).toFixed(1)+'%' : '0%';
+  }
+
+  load();
+  paint();
+  boxes.forEach(function(b){ b.addEventListener('change', function(){ save(); paint(); }); });
+  document.getElementById('reset').addEventListener('click', function(){
+    boxes.forEach(function(b){ b.checked = false; });
+    save(); paint();
+  });
+})();
+</script>
+</body>
+</html>
